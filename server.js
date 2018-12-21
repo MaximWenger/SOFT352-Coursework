@@ -47,8 +47,36 @@ function askQuestion() {
       connections[id].sendUTF("New message (obj): '" + answer + "'");
     }
 
-    askQuestion();
+    askQuestion(); //Never ending loop
   });  
 }
+
+playerFactory = { //Pratical 3 | Used to create new players
+	create: function (pColor, pName, pId){
+		var p;
+		p = {
+		'color': pColor,
+		'name': pName,
+		'Id': pId
+		}
+	return p;
+	}
+};
+
+gameFactory = { //Used to create new game objects, using player objects
+	create : function (pPlayer1, pPlayer2){
+		var p;
+		p = {
+			'p1': pPlayer1,
+			'p2': pPlayer2,
+			'p1Score': 0,
+			'p1Score': 0,
+			'gmeTime': 0
+		}
+		return p;
+	}
+};
+
+
 
 askQuestion();
