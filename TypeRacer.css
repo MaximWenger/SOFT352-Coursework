@@ -6,3 +6,47 @@
   transform: translate(-50%,-50%);
  
 }
+.col-5{
+	background: red;
+	  top: 50%;
+}
+#userStartBtn{
+
+}
+.foo {
+  float: left;
+  width: 20px;
+  height: 20px;
+  margin: 5px;
+  border: 1px solid rgba(0, 0, 0, .2);
+  background: #DC143C;
+}
+
+.dot1 {
+  height: 25px;
+  width: 25px;
+  background-color: #FF1493;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot2 {
+  height: 25px;
+  width: 25px;
+  background-color: #FFA500;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot3 {
+  height: 25px;
+  width: 25px;
+  background-color: #0000FF;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot4 {
+  height: 25px;
+  width: 25px;
+  background-color: #008000;
+  border-radius: 50%;
+  display: inline-block;
+}
