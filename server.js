@@ -24,6 +24,10 @@ wsServer.on("request", function(request) {
     console.log("Closing a connection");
     delete connections[id];   // Delete the connection from the object once the client disconnects.
   });
+  
+  connection.on("message", function incoming(request) {
+	 console.log("Received:hhhhhhhhhhhh ");
+});
 
   // Add the new connection to the array of connections.
   connections[id] = connection;
@@ -80,9 +84,7 @@ gameFactory = { //Used to create new game objects, using player objects
 //ebSocketServer.onmessage = function(message){ //When get a message, do this
 //    console.log("Received:hhhhhhhhhhhh ");
 //}
-wsServer.on("message", function(request) {
-	 console.log("Received:hhhhhhhhhhhh ");
-});
+
 
 
 askQuestion();
