@@ -77,6 +77,12 @@ gameFactory = { //Used to create new game objects, using player objects
 	}
 };
 
+//ebSocketServer.onmessage = function(message){ //When get a message, do this
+//    console.log("Received:hhhhhhhhhhhh ");
+//}
+wsServer.on("message", function(request) {
+	 console.log("Received:hhhhhhhhhhhh ");
+});
 
 
 askQuestion();

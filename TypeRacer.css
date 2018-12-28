@@ -1,5 +1,5 @@
 /* Your CSS goes here */
-.main {
+.mainStart {
   position: absolute;
   top: 50%;
   left:50%;
@@ -13,7 +13,7 @@
 #userStartBtn{
 
 }
-.foo {
+.serverStatusBx {
   float: left;
   width: 20px;
   height: 20px;
