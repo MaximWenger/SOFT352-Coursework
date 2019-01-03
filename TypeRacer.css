@@ -22,28 +22,28 @@
   background: #DC143C;
 }
 
-.dot1 {
+.dotPink {
   height: 25px;
   width: 25px;
   background-color: #FF1493;
   border-radius: 50%;
   display: inline-block;
 }
-.dot2 {
+.dotOrange {
   height: 25px;
   width: 25px;
   background-color: #FFA500;
   border-radius: 50%;
   display: inline-block;
 }
-.dot3 {
+.dotBlue {
   height: 25px;
   width: 25px;
   background-color: #0000FF;
   border-radius: 50%;
   display: inline-block;
 }
-.dot4 {
+.dotGreen {
   height: 25px;
   width: 25px;
   background-color: #008000;

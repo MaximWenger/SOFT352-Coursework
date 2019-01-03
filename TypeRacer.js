@@ -24,17 +24,18 @@ function updateConnStatus(){ //Updates server status to green
 	$(".serverStatusBx").css("background-color", "#008000");
 	$('#serverStatusTxt').text('Online');
 }
-function chosenColor(Color){ //Turns all other colors opaque (Keeping chosen color full)
-	var colors = [".dot1", ".dot2", ".dot3", ".dot4"];
+function chosenColor(Color){ //Turns all other colors opaque (Keeping chosen color full) Returns chosen color
+	var colors = ["dotPink", "dotOrange", "dotBlue", "dotGreen"];
 	var color = Color;
 	for (var i = 0; i <= colors.length; i++){
 		if (colors[i] != color){
-		$(colors[i]).css("opacity", "0.2");
+		$("." + colors[i]).css("opacity", "0.2");
 		}
 		else {
-			$(colors[i]).css("opacity", "1");
+			$("." + colors[i]).css("opacity", "1");
 		}
 	}
+	return color;
 }
 
 function sendServer(message){
@@ -42,27 +43,34 @@ function sendServer(message){
 }
 
 $(document).ready(function(){
+	var color = "unspecified"; //Used to store the users chosen color
 
-$(".dot1").click(function () {
-console.log("Chosen .dot1");
-chosenColor(".dot1");
+$(".dotPink").click(function () {
+console.log("Chosen dotPink");
+color = chosenColor("dotPink");//Used to update the users chosen color
+
 });
-$(".dot2").click(function () {
-console.log("Chosen .dot2");
-chosenColor(".dot2");
+$(".dotOrange").click(function () {
+console.log("Chosen dotOrange");
+color = chosenColor("dotOrange");
+
 });
-$(".dot3").click(function () {
-console.log("Chosen .dot3");
-chosenColor(".dot3");
+$(".dotBlue").click(function () {
+console.log("Chosen dotBlue");
+color = chosenColor("dotBlue");
+
 });
-$(".dot4").click(function () {
-console.log("Chosen .dot4");
-chosenColor(".dot4");
+$(".dotGreen").click(function () {
+console.log("Chosen dotGreen");
+color = chosenColor("dotGreen");
+
 });
 
 $("#userStartBtn").click(function(){
 	//sendServer("testing testing, 1,2,3");
-	WebSocketClient.send("HELOOOOOOO");
+	var userName = $('#userName').val();
+
+	WebSocketClient.send("C." + color + ".UN" + userName);
 });
 
 

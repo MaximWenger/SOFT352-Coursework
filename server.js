@@ -26,7 +26,7 @@ wsServer.on("request", function(request) {
   });
   
   connection.on("message", function incoming(request) {
-	 console.log("Received:hhhhhhhhhhhh ");
+	 console.log(request.utf8Data);
 });
 
   // Add the new connection to the array of connections.
