@@ -15,26 +15,31 @@ wsServer = new WebSocketServer({
 });
 
 var connections = {}; //Factory pattern for each new connection
+var players = {} // To store all current users
 
 wsServer.on("request", function(request) {
   var connection = request.accept(null, request.origin);
-  var id = uuidv4(); //assigns random number as the ID
+    var id = uuidv4(); //assigns random number as the ID
+
 
   connection.on("close", function(reasonCode, description) {
     console.log("Closing a connection");
     delete connections[id];   // Delete the connection from the object once the client disconnects.
   });
   
-  connection.on("message", function incoming(request) {
-	 console.log(request.utf8Data);
-	 createPlayer(request, connections.id);
-});
+
 
   // Add the new connection to the array of connections.
   connections[id] = connection;
   for (var id in connections) {
     connections[id].sendUTF("A new connection was made - now " + Object.keys(connections).length + " connected clients (" + connection.id + ")");
   }
+
+    connection.on("message", function incoming(request) {
+        console.log(request.utf8Data);
+        createPlayer(request, id);
+    });
+
 });
 
 var rl = readline.createInterface({
@@ -56,16 +61,12 @@ function askQuestion() {
   });  
 }
 
+
 function createPlayer(message, id){
-//var color = getDetails(message);
 var color = getColor(message);
 var name = getUserName(message);
-var player = playerFactory.create(color, name, id); //Creates new playerr object
-//Now to save the player to a global array.
-//Find when two players are waiting
-//create new game
-//play
-
+    players[id] = playerFactory.create(color, name, id); //Creates new playerr object
+    console.log(players[id].color);
 }
 function getColor(message){ //Returns the user chosen colour
 	var x = [];
