@@ -70,7 +70,7 @@ $("#userStartBtn").click(function(){
 	//sendServer("testing testing, 1,2,3");
 	var userName = $('#userName').val();
 
-	WebSocketClient.send("C." + color + ".UN" + userName);
+	WebSocketClient.send(color + "~" + userName);
 });
 
 

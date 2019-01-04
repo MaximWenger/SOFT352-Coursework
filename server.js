@@ -27,6 +27,7 @@ wsServer.on("request", function(request) {
   
   connection.on("message", function incoming(request) {
 	 console.log(request.utf8Data);
+	 createPlayer(request, connections.id);
 });
 
   // Add the new connection to the array of connections.
@@ -55,6 +56,46 @@ function askQuestion() {
   });  
 }
 
+function createPlayer(message, id){
+//var color = getDetails(message);
+var color = getColor(message);
+var name = getUserName(message);
+var player = playerFactory.create(color, name, id); //Creates new playerr object
+//Now to save the player to a global array.
+//Find when two players are waiting
+//create new game
+//play
+
+}
+function getColor(message){ //Returns the user chosen colour
+	var x = [];
+	x = message.utf8Data;
+	var color = "";
+	for (var i = 3; i < x.length; i++){
+		if (x[i] == "~"){
+			break;
+	}
+		color = color + x[i];
+	}
+	return color;
+}
+function getUserName(message){ //Returns the userName given by the user
+		var x = [];
+	x = message.utf8Data;
+	var userName = "";
+	var lineFound = false;
+	for (var i = 0; i < x.length; i++){
+		if (x[i] == "~"){
+			lineFound = true;
+			
+	}
+	if (lineFound == true && x[i] != "~"){
+		userName = userName + x[i];
+	}
+	}
+	return userName;
+}
+
 playerFactory = { //Pratical 3 | Used to create new players
 	create: function (pColor, pName, pId){
 		var p;
@@ -80,11 +121,5 @@ gameFactory = { //Used to create new game objects, using player objects
 		return p;
 	}
 };
-
-//ebSocketServer.onmessage = function(message){ //When get a message, do this
-//    console.log("Received:hhhhhhhhhhhh ");
-//}
-
-
 
 askQuestion();
