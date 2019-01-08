@@ -39,8 +39,13 @@ wsServer.on("request", function(request) {
     connection.on("message", function incoming(request) {		
         console.log(request.utf8Data);
 
-		if (identifyMsg(request) == "player"){ //Confirming it's a new player joining			
+		if (identifyMsg(request) == "player"){ //Confirming it's a new player joining	
+			console.log("New Player!");		
 			createPlayer(request, id);
+			
+			console.log(Object.keys(connections).length + "Total Connections");
+			console.log(Object.keys(players).length + "Total Players");
+
 		};
     });
 
@@ -74,6 +79,9 @@ function startTicker(){
 	console.log("Ticker ON");
 	var timer = setInterval(main, 1000); //Calls the main function once a second.
 }
+function stopTicker(){
+	clearTimeout(timer);
+}
 
 
 function createPlayer(message, id){ //Creates new user object, using the users color and name
@@ -95,25 +103,40 @@ function beginGame(){
 	var counter = 0;
 	var P1;
 	var P2;
-	for (var i = 0; i < players.length; i++){ //Find the first two available players
-		if (players[i].playing == 'N' || counter < 2){
+	for (var i = 0; i < Object.keys(players).length; i++){ //Find the first two available players
+	for (var id in players){ //For each object within players
+		if (players[id].playing == "N" || counter < 2){ //If the player is not already in a game
 			if (counter == 0){
-			P1 = i;
+			P1 = id;
+			console.log(players[id].playing + "  Player 1");
+			console.log("Changed to"+ " Player 1");
+			players[id].playing = "Y";
+			console.log(players[id].playing + " Player 1");
 			counter++;
 			}
 			else if (counter == 1){
-				P2 = i;
+				P2 = id;
 				counter++;
+			console.log(players[id].playing + " Player 2");
+			console.log("Changed to" + " Player 2");
+			players[id].playing = "Y";
+			console.log(players[id].playing + " Player 2"); //------------------------------ Finished here tonight, now to start the timer for the game(s) and start sending over the data to the client! Also need to stop this ticker from running when it's not needed 
 				break;
 			}
 		}
+		}
 	}
-	console.log(players[P1].playing);
-	console.log(players[P2].playing);
-	players[P1].playing = 'Y';
-	players[P2].playing = 'Y';
-		console.log(players[P1].playing);
-	console.log(players[P2].playing);
+	
+	//NOW ACTUALLY CREATE THE GAME OBJECT -------------------------------------------
+	
+	stopTicker();
+	
+	//console.log(Object.values(players[P1].name));
+	//console.log(players[P2].playing);
+	//players[P1].playing = 'Y';
+	//players[P2].playing = 'Y';
+	//console.log(players[P1].playing);
+	//console.log(players[P2].playing);
 	//createGame(players[P1], players[P2]);
 }
 
@@ -153,7 +176,7 @@ playerFactory = { //Pratical 3 | Used to create new players
 		'color': pColor,
 		'name': pName,
 		'Id': pId,
-		'playing':'N'
+		'playing':"N"
 		}
 	return p;
 	}
@@ -177,8 +200,8 @@ gameFactory = { //Used to create new game objects, using player objects
 
 function main(){
 	console.log("Tick");
-	console.log(players.length + ":Player length");
-	if (players.length >= 2){
+	console.log(Object.keys(players).length + "Total Players");
+	if (Object.keys(players).length >= 2){
 		console.log("Got to Main!")
 		beginGame();
 	}
