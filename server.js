@@ -25,6 +25,7 @@ wsServer.on("request", function(request) {
 
   connection.on("close", function(reasonCode, description) {
     console.log("Closing a connection");
+	removePlayer(id); //removes the player from Players
     delete connections[id];   // Delete the connection from the object once the client disconnects.
   });
   
@@ -69,6 +70,14 @@ var rl = readline.createInterface({
 //    askQuestion(); //Never ending loop
  // });  
 //}
+function removePlayer(id){//Removes a player from Players if they disconnect
+	for (var ident in players){
+		if (players[ident].Id == id){
+			delete players[ident];
+		}
+	}
+}
+
 function identifyMsg(message){//Used to identify the type of message sent from client
 	var fullMsg = message.utf8Data;
 	if (fullMsg.includes("~")){//Used to identfy is the message is a new user settings being recieved
@@ -99,15 +108,17 @@ function createGame(player1, player2){ //Creates a new Game object
 	
 }
 
-function beginGame(){
+function assignPlayers(){ //Returns two players in a single array which are not in a game.
 	var counter = 0;
 	var P1;
 	var P2;
+	
+	if ( Object.keys(players).length >= 2){
 	for (var i = 0; i < Object.keys(players).length; i++){ //Find the first two available players
 	for (var id in players){ //For each object within players
 		if (players[id].playing == "N" || counter < 2){ //If the player is not already in a game
 			if (counter == 0){
-			P1 = id;
+			P1 = players[id].Id;
 			console.log(players[id].playing + "  Player 1");
 			console.log("Changed to"+ " Player 1");
 			players[id].playing = "Y";
@@ -115,20 +126,27 @@ function beginGame(){
 			counter++;
 			}
 			else if (counter == 1){
-				P2 = id;
+				P2 = players[id].Id;
 				counter++;
 			console.log(players[id].playing + " Player 2");
 			console.log("Changed to" + " Player 2");
 			players[id].playing = "Y";
 			console.log(players[id].playing + " Player 2"); //------------------------------ Finished here tonight, now to start the timer for the game(s) and start sending over the data to the client! Also need to stop this ticker from running when it's not needed 
-				break;
+				var comboPlayers = [P1, P2];
+				return comboPlayers;
 			}
 		}
 		}
 	}
+}
+return false;
+}
+
+function beginGame(){
+var comboPlayers = assignPlayers(); //Assign two players who are not in a game.
 	
-	//NOW ACTUALLY CREATE THE GAME OBJECT -------------------------------------------
-	
+createGame(players[comboPlayers[0]], players[comboPlayers[1]]); //Create new Game with these players
+
 	stopTicker();
 	
 	//console.log(Object.values(players[P1].name));
@@ -198,12 +216,16 @@ gameFactory = { //Used to create new game objects, using player objects
 
 
 
+
+
 function main(){
 	console.log("Tick");
 	console.log(Object.keys(players).length + "Total Players");
 	if (Object.keys(players).length >= 2){
+		
 		console.log("Got to Main!")
 		beginGame();
+		
 	}
 }
 
