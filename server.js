@@ -17,6 +17,8 @@ wsServer = new WebSocketServer({
 var connections = {}; //Factory pattern for each new connection
 var players = {}; // To store all current users
 var games = {}; //To store all current games
+var timerMain; //Used as main timer for server
+var testCounter = 0;
 
 wsServer.on("request", function(request) {
   var connection = request.accept(null, request.origin);
@@ -86,10 +88,10 @@ function identifyMsg(message){//Used to identify the type of message sent from c
 }
 function startTicker(){
 	console.log("Ticker ON");
-	var timer = setInterval(main, 1000); //Calls the main function once a second.
+	timerMain = setInterval(main, 1000); //Calls the main function once a second.
 }
 function stopTicker(){
-	clearTimeout(timer);
+	clearTimeout(timerMain);
 }
 
 
@@ -114,9 +116,8 @@ function assignPlayers(){ //Returns two players in a single array which are not 
 	var P2;
 	
 	if ( Object.keys(players).length >= 2){
-	for (var i = 0; i < Object.keys(players).length; i++){ //Find the first two available players
 	for (var id in players){ //For each object within players
-		if (players[id].playing == "N" || counter < 2){ //If the player is not already in a game
+		if (players[id].playing == "N" && counter < 2){ //If the player is not already in a game
 			if (counter == 0){
 			P1 = players[id].Id;
 			console.log(players[id].playing + "  Player 1");
@@ -137,25 +138,19 @@ function assignPlayers(){ //Returns two players in a single array which are not 
 			}
 		}
 		}
-	}
 }
 return false;
 }
 
 function beginGame(){
 var comboPlayers = assignPlayers(); //Assign two players who are not in a game.
-	
-createGame(players[comboPlayers[0]], players[comboPlayers[1]]); //Create new Game with these players
+	if (comboPlayers != false){
+		createGame(players[comboPlayers[0]], players[comboPlayers[1]]); //Create new Game with these players
 
-	stopTicker();
-	
-	//console.log(Object.values(players[P1].name));
-	//console.log(players[P2].playing);
-	//players[P1].playing = 'Y';
-	//players[P2].playing = 'Y';
-	//console.log(players[P1].playing);
-	//console.log(players[P2].playing);
-	//createGame(players[P1], players[P2]);
+	}
+	else{
+		console.log("Cannot create a new game, no players available");
+	}
 }
 
 function getColor(message){ //Returns the user chosen colour
@@ -225,6 +220,16 @@ function main(){
 		
 		console.log("Got to Main!")
 		beginGame();
+		
+		if (Object.keys(games).length >= 1){
+			//run each game
+			console.log("TICK GAME RUNNING");
+			
+				testCounter = testCounter + 1;
+				if (testCounter >= 2){
+					stopTicker();
+				}
+		}
 		
 	}
 }
