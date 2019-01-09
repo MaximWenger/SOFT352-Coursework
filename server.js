@@ -19,6 +19,7 @@ var players = {}; // To store all current users
 var games = {}; //To store all current games
 var timerMain; //Used as main timer for server
 var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut"];
+var wordTimer = 0;
 
 wsServer.on("request", function(request) {
   var connection = request.accept(null, request.origin);
@@ -211,19 +212,25 @@ gameFactory = { //Used to create new game objects, using player objects
 
 function beginGame(){
 	
-	incrementGTime();
-	sendWord();
+	incrementGTime(); //Increment Game time
+	checkGTime(); //Check game time
 
+	sendWord(); //Send a new word to each user
 	
-	//send words
-	
-	
-	//array of words
-	// send the words
-	//send the time
+
+}
+function checkGTime(){ //Check time, end game if time >= 60 seconds
+	  for (var id in games) {
+    if (games[id].gmeTime >= 60){
+		//END GAME
+		//Send message to client to end the game
+		//Display the scoreboard
+	}
+   }
 }
 
 function incrementGTime(){ //Increment the game timer by 1 each Tick
+wordTimer++;
   for (var id in games) {
     games[id].gmeTime = games[id].gmeTime + 1;
    }
@@ -263,7 +270,7 @@ function main(){
 			//run each game
 			console.log("TICK GAME RUNNING");
 			beginGame();
-			stopTicker();
+			
 
 		}
 		
