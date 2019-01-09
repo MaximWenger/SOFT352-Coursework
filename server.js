@@ -18,7 +18,7 @@ var connections = {}; //Factory pattern for each new connection
 var players = {}; // To store all current users
 var games = {}; //To store all current games
 var timerMain; //Used as main timer for server
-var testCounter = 0;
+var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut"];
 
 wsServer.on("request", function(request) {
   var connection = request.accept(null, request.origin);
@@ -104,7 +104,7 @@ var name = getUserName(message);
 }
 
 
-function createGame(player1, player2){ //Creates a new Game object 
+function createGameObj(player1, player2){ //Creates a new Game object 
 	var GId = uuidv4(); //Produces random ID
 	games[GId] = gameFactory.create(player1, player2); //Creates new gameID
 	
@@ -142,10 +142,10 @@ function assignPlayers(){ //Returns two players in a single array which are not 
 return false;
 }
 
-function beginGame(){
+function createGame(){
 var comboPlayers = assignPlayers(); //Assign two players who are not in a game.
 	if (comboPlayers != false){
-		createGame(players[comboPlayers[0]], players[comboPlayers[1]]); //Create new Game with these players
+		createGameObj(players[comboPlayers[0]], players[comboPlayers[1]]); //Create new Game with these players
 
 	}
 	else{
@@ -209,6 +209,43 @@ gameFactory = { //Used to create new game objects, using player objects
 	}
 };
 
+function beginGame(){
+	
+	incrementGTime();
+	sendWord();
+
+	
+	//send words
+	
+	
+	//array of words
+	// send the words
+	//send the time
+}
+
+function incrementGTime(){ //Increment the game timer by 1 each Tick
+  for (var id in games) {
+    games[id].gmeTime = games[id].gmeTime + 1;
+   }
+}
+
+function sendWord(){ //Sends a random word to all players within all games
+	var p1ID;
+	var p2ID;
+    for (var p in games) {
+		console.log("SENDING MESSAGE GAMES");
+		//send something to each player within the game
+		for (var q in connections) {
+			console.log("SENDING MESSAGE CONNECTIONS");
+			p1ID = games[p].p1.Id; //Gets ID of player1 
+			p2ID = games[p].p2.Id; //Gets ID of player2 
+		}
+			var word = gameWords[Math.floor((Math.random() * (gameWords.length - 1)))]; //Chooses a random word from gameWords array
+			connections[p1ID].sendUTF(word);//Sends the word to player 1
+			connections[p2ID].sendUTF(word);//Sends the word to player 2
+    }
+}
+
 
 
 
@@ -219,16 +256,15 @@ function main(){
 	if (Object.keys(players).length >= 2){
 		
 		console.log("Got to Main!")
-		beginGame();
+		createGame();
+		console.log(Object.keys(games).length + " Games Exisit")
 		
 		if (Object.keys(games).length >= 1){
 			//run each game
 			console.log("TICK GAME RUNNING");
-			
-				testCounter = testCounter + 1;
-				if (testCounter >= 2){
-					stopTicker();
-				}
+			beginGame();
+			stopTicker();
+
 		}
 		
 	}
