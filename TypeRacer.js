@@ -61,7 +61,7 @@ if (wordsLive.length < 12 && wordsReserve.length > 1){
 
 function identifyMsg(message){//Used to identify the type of message sent from server
 	var fullMsg = message.data;
-	console.log(fullMsg);
+	//console.log(fullMsg);
 	if (fullMsg.includes("start")){//Used to identfy if the message is a new game
 		return "start";
 	}
@@ -91,6 +91,70 @@ function chosenColor(Color){ //Turns all other colors opaque (Keeping chosen col
 
 function sendServer(message){
 	WebSocketClient.send(message);
+}
+
+function removeLiveWord(number){//Removes the live word after user has typed it correctly
+	wordsLive.splice(number, 1);//Removes the word from wordsReserve
+	
+}
+
+function clearUserInput(){//Clears the user input, to allow them to continue typing
+	$('#userGameTxt').val(""); 
+}
+
+function tryMatch(user, wordStore){//used to compare the user imput to stored words
+	if (user == wordStore){
+		return true;
+		//It matches! Try another one
+		}
+		else {
+			return false;
+		}
+}
+
+function sendScore(score){ //Sends the score of the correct word to the server
+	sendServer("score" + score);
+	console.log("SCORE SENT");
+}
+
+function testUserText(){//Used to find out if the users Text matches with any of the given words
+var userValue = $('#userGameTxt').val();
+var matches = false;
+var lengthMatch = 0;
+var word;
+var complete = false;  //Used to ensure only one word is removed if dupes within the array
+if (gameStart == true){//the game has started
+for (var q = 0; q <= wordsLive.length; q++){ //Determines if the user has correctly typed the whole word displayed on the screen
+	word = wordsLive[q]
+	for (var i = 0; i <= userValue.length; i++){//For the entire length of the user value
+	if ((tryMatch(userValue.slice(0,1), word.slice(0,1))) == true){
+		console.log("MATCHING");
+		
+		matches = tryMatch(userValue, word); //Tries to see if the whole word matches
+		if (matches == true){
+			console.log("WHOLE WORD IS MATCHING")
+			removeLiveWord(q);
+			
+			console.log("WORD IS NOW GONE");
+			complete == true; //Used to ensure only one word is removed if dupes within the array
+			sendScore(word.length);
+			clearUserInput();
+			break;
+			//REMOVE THIS WORD, SEND SCORE AND UPDATE THE FRONT
+			
+		} else {
+			for (var x = 0; x <= userValue.length; x++){
+				if (tryMatch(userValue.slice(0,x), word.slice(0,x)) == true){
+					//UPDATE THE COLOURS ON THE CORRECT DISPLAYED WORD
+					console.log("LOOKS TO BE GOOD ");
+				}
+			}
+		}
+	}
+	}
+}
+}
+}
 }
 
 $(document).ready(function(){
@@ -127,57 +191,11 @@ $("#userStartBtn").click(function(){
 });
 
 $("body").keypress(function(evt){//
-var userValue = $('#userGameTxt').val();
-var matches = false;
-var lengthMatch = 0;
-if (gameStart == true){//the game has started
+testUserText();//Used to find out if the users Text matches with any of the given words
 
-for (var q = 0; q <= wordsLive.length; q++){ //Determines if the user has correctly typed the whole word displayed on the screen
-	var word = wordsLive[q]
-	for (var i = 0; i <= userValue.length; i++){//For the entire length of the user value
-	if ((tryMatch(userValue.slice(0,1), word.slice(0,1))) == true){
-		console.log("MATCHING");
-		
-		matches = tryMatch(userValue, word); //Tries to see if the whole word matches
-		if (matches == true){
-			console.log("WHOLE WORD IS MATCHING")
-			removeLiveWord(q);
-			console.log("WORD IS NOW GONE");
-			clearUserInput();
-			//REMOVE THIS WORD, SEND SCORE AND UPDATE THE FRONT
-			
-		} else {
-			for (var x = 0; x <= userValue.length; x++){
-				if (tryMatch(userValue.slice(0,x), word.slice(0,x)) == true){
-					//UPDATE THE COLOURS ON THE CORRECT DISPLAYED WORD
-					console.log("LOOKS TO BE GOOD ");
-				}
-			}
-		}
-	}
-	}
-}
-}
 });
 
 
 });
 
-function removeLiveWord(number){//Removes the live word after user has typed it correctly
-	wordsLive.splice(number, 1);//Removes the word from wordsReserve
-	
-}
 
-function clearUserInput(){//Clears the user input, to allow them to continue typing
-	$('#userGameTxt').val(""); 
-}
-
-function tryMatch(user, wordStore){//used to compare the user imput to stored words
-	if (user == wordStore){
-		return true;
-		//It matches! Try another one
-		}
-		else {
-			return false;
-		}
-}

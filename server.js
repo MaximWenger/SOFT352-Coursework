@@ -49,8 +49,34 @@ wsServer.on("request", function(request) {
 			
 			console.log(Object.keys(connections).length + "Total Connections");
 			console.log(Object.keys(players).length + "Total Players");
+		} else if (identifyMsg(request) == "score"){
+			console.log("SCOREEEEEEEEEEEEEEEEEEEE");
+			
+			for (var p in games){
+				//console.log(games[p].p1.Id);//Player id
+			if (id == games[p].p1.Id){
+				console.log("YUPPPP");
+				games[p].p1Score = getScore(request);
+			}
+			else if (id == games[p].p2.Id){
+				console.log("YUPP");
+				getScore(request);
+				games[p].p2Score = getScore(request);
+			}
+					
+					//connections[id].sendUTF("AHHHHHHHHHHHHH");				
+					//connections[games[p].p2.Id].sendUTF("AGGGGGGGGGGGGG"); THESE BOTH GO TO THE SAME ID
+					//console.log(id) + "Just ID";
+					//console.log(games[p].p2.Id + "BIG LONG ONE");
 
-		};
+					
+			console.log(games[p].p1Score + "P1 score");
+			console.log(games[p].p2Score + "P2 score");
+			
+			stopTicker();
+			}
+		}
+		
     });
 
 });
@@ -85,7 +111,16 @@ function identifyMsg(message){//Used to identify the type of message sent from c
 	var fullMsg = message.utf8Data;
 	if (fullMsg.includes("~")){//Used to identfy is the message is a new user settings being recieved
 		return "player";
+	} else if (fullMsg.includes("score")){
+		return "score";
 	}
+}
+
+function getScore(message){//Returns the user score, removing the word "score"
+	var fullMsg = message.utf8Data;
+	var score = 0;
+	score = fullMsg.slice(5);
+	return score;
 }
 function startTicker(){
 	console.log("Ticker ON");
@@ -96,7 +131,7 @@ function stopTicker(){
 }
 
 
-function createPlayer(message, id){ //Creates new user object, using the users color and name
+function createPlayer(message, id){ //Creates new user object, using the users color and name and connection id
 console.log("Creating player")
 var color = getColor(message);
 var name = getUserName(message);
