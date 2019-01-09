@@ -212,13 +212,18 @@ gameFactory = { //Used to create new game objects, using player objects
 
 function beginGame(){
 	
-	incrementGTime(); //Increment Game time
+incrementGTime(); //Increment Game time
 	checkGTime(); //Check game time
-
+for (var p in games){
+	if (games[p].gmeTime <= 1){
+		sendStart();
+	} else {
 	sendWord(); //Send a new word to each user
-	
-
+	}
 }
+}
+
+
 function checkGTime(){ //Check time, end game if time >= 60 seconds
 	  for (var id in games) {
     if (games[id].gmeTime >= 60){
@@ -252,7 +257,22 @@ function sendWord(){ //Sends a random word to all players within all games
 			connections[p2ID].sendUTF(word);//Sends the word to player 2
     }
 }
-
+ function sendStart(){
+	 var p1ID;
+	var p2ID;
+    for (var p in games) {
+		console.log("SENDING MESSAGE GAMES");
+		//send something to each player within the game
+		for (var q in connections) {
+			console.log("SENDING MESSAGE CONNECTIONS");
+			p1ID = games[p].p1.Id; //Gets ID of player1 
+			p2ID = games[p].p2.Id; //Gets ID of player2 
+		}
+			
+			connections[p1ID].sendUTF("start");//Sends the word to player 1
+			connections[p2ID].sendUTF("start");//Sends the word to player 2
+    }
+ }
 
 
 
