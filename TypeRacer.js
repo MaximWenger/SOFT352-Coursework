@@ -1,7 +1,9 @@
 // Your JavaScript functions go here
 
 var WebSocketClient = new WebSocket("ws://localhost:9000");
-var words = [];
+var wordsLive = [];
+var wordsReserve = [];
+var gameStart = false;
 
 WebSocketClient.onopen = function(event){ //When connection is on, do this
 	WebSocketClient.send("Hello world from the client");
@@ -15,9 +17,17 @@ WebSocketClient.onmessage = function(message){ //When get a message, do this
 var msg = identifyMsg(message);
 if (msg == "start"){
 	//Remove everything and be ready to recieve and display words!
-	$(".mainStart").css("visibility", "hidden"); //Once the game starts, remove the original webpage
-} else if (msg == "play"){
-	words[words.length] = message.data;//Store the words within an array
+	gameStart = true;
+	changeGameModePlay();
+	
+} else if (msg == "play"){//Store the words within an array
+	if (wordsLive.length <= 11){
+	wordsLive[wordsLive.length] = message.data;//Only keep 12 words ready at any time
+	}
+	else {
+		wordsReserve[wordsReserve.length] = message.data;//Used to store all other words
+	}
+	populateWords();
 	//NOW move these words onto any of the grids
 	//Display the words within the grids 
 //Have the letters change, depending on what is being typed
@@ -29,6 +39,24 @@ if (msg == "start"){
 WebSocketClient.onerror = function (event){
 	console.log("Error connecting to server =" + event);
 	
+}
+
+function changeGameModePlay(){ //Change the visibility to remove front page and display game page.
+	$(".mainStart").css("visibility", "hidden"); //Once the game starts, remove the original webpage
+	$(".mainGame").css("visibility", "visible");//Show the game page
+	$("#userGameTxt").select(); //Autoselect the textbox so the user can begin typing
+}
+
+function populateWords(){//Populates the words for the user to type
+
+if (wordsLive.length < 12 && wordsReserve.length > 1){
+	wordsLive[wordsLive.length] = wordsReserve[0];
+	wordsReserve.splice(1, 1);//Removes the word from wordsReserve
+}
+	
+	for (var i = 0; i <= 12 && i < wordsLive.length; i++){ //Populate the display grid with given words from the server
+		$("#grid" + (i + 1)).text(wordsLive[i]);
+	}
 }
 
 function identifyMsg(message){//Used to identify the type of message sent from server
@@ -66,6 +94,7 @@ function sendServer(message){
 }
 
 $(document).ready(function(){
+	$(".mainGame").css("visibility", "hidden"); //Hide the game page
 	var color = "unspecified"; //Used to store the users chosen color
 	
 
@@ -97,5 +126,58 @@ $("#userStartBtn").click(function(){
 	WebSocketClient.send(color + "~" + userName);
 });
 
+$("body").keypress(function(evt){//
+var userValue = $('#userGameTxt').val();
+var matches = false;
+var lengthMatch = 0;
+if (gameStart == true){//the game has started
+
+for (var q = 0; q <= wordsLive.length; q++){ //Determines if the user has correctly typed the whole word displayed on the screen
+	var word = wordsLive[q]
+	for (var i = 0; i <= userValue.length; i++){//For the entire length of the user value
+	if ((tryMatch(userValue.slice(0,1), word.slice(0,1))) == true){
+		console.log("MATCHING");
+		
+		matches = tryMatch(userValue, word); //Tries to see if the whole word matches
+		if (matches == true){
+			console.log("WHOLE WORD IS MATCHING")
+			removeLiveWord(q);
+			console.log("WORD IS NOW GONE");
+			clearUserInput();
+			//REMOVE THIS WORD, SEND SCORE AND UPDATE THE FRONT
+			
+		} else {
+			for (var x = 0; x <= userValue.length; x++){
+				if (tryMatch(userValue.slice(0,x), word.slice(0,x)) == true){
+					//UPDATE THE COLOURS ON THE CORRECT DISPLAYED WORD
+					console.log("LOOKS TO BE GOOD ");
+				}
+			}
+		}
+	}
+	}
+}
+}
+});
+
 
 });
+
+function removeLiveWord(number){//Removes the live word after user has typed it correctly
+	wordsLive.splice(number, 1);//Removes the word from wordsReserve
+	
+}
+
+function clearUserInput(){//Clears the user input, to allow them to continue typing
+	$('#userGameTxt').val(""); 
+}
+
+function tryMatch(user, wordStore){//used to compare the user imput to stored words
+	if (user == wordStore){
+		return true;
+		//It matches! Try another one
+		}
+		else {
+			return false;
+		}
+}

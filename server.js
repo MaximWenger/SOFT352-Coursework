@@ -18,7 +18,7 @@ var connections = {}; //Factory pattern for each new connection
 var players = {}; // To store all current users
 var games = {}; //To store all current games
 var timerMain; //Used as main timer for server
-var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut"];
+var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut", "Lychee", "Mango", "Mulberry", "Olive", "Orange", "Lime", "Kiwi", "Juniper", "Pear", "Persimmon", "Physalis", "Pineapple", "Plum", "Strawberry", "Star fruit", "Redcurrant", "Quince" ];
 var wordTimer = 0;
 
 wsServer.on("request", function(request) {
@@ -37,7 +37,7 @@ wsServer.on("request", function(request) {
   // Add the new connection to the array of connections.
   connections[id] = connection;
   for (var id in connections) {
-    connections[id].sendUTF("A new connection was made - now " + Object.keys(connections).length + " connected clients (" + connection.id + ")");
+    //connections[id].sendUTF("A new connection was made - now " + Object.keys(connections).length + " connected clients (" + connection.id + ")");
   }
 
     connection.on("message", function incoming(request) {		
