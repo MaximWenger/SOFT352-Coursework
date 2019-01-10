@@ -16,7 +16,6 @@ var score;
 
 WebSocketClient.onopen = function(event){ //When connection is on, do this
 	WebSocketClient.send("Hello world from the client");
-//	var connected = false;
 	console.log("Socket connected succes");
 	updateConnStatus();
 }
@@ -33,12 +32,6 @@ if (msg == "start"){
 	if (wordsLive.length <= 11){
 	wordsLive[wordsLive.length] = message.data;//Only keep 12 words ready at any time
 	}
-//	else if (msg == "draw"){
-//		console.log("DRRRRRAAAAAAWWWWWWWWWWWWWWW");
-//	}
-//	else if (msg == "win"){
-//		console.log("wIIIIIIIIIIIIIIIIIIIIIIIIIINNNNNNNNNNN");
-//	}
 	else {
 		wordsReserve[wordsReserve.length] = message.data;//Used to store all other words
 	}
@@ -142,11 +135,48 @@ function populateLocalScore(message){
 
 
 if (localStorage.win1 == null){ //If no score is kept, populate with default values
-localStorage.win = [0,0,0,0,0,0,0,0,0,0]; //Used to keep the score of winners
-localStorage.name = [0,0,0,0,0,0,0,0,0,0]; //User to keep the name of winners
+localStorage.win0 = 0; //Used to keep the score of winners
+localStorage.win1 = 0;
+
+localStorage.name0 = ""; //User to keep the name of winners
+localStorage.name1 = "";
+
+}
+ //Bubble sort to organise both (depending on number array)
+ var winScore;
+ var winPlayer;
+ var position;
+ if (p1Score > p2Score){
+	 winScore = p1Score;
+	 winPlayer = p1Name;
+position = sortLeaderBoard(winScore, winPlayer);
+ } else if (p2Score > p1Score){
+	 winScore = p2Score;
+	 winPlayer = p2Name;
+position =  sortLeaderBoard(winScore, winPlayer);
+ }
+	displayLocalBoard();
 }
 
-	
+function sortLeaderBoard(score, winplayer){ //Updates the local leader board
+	if (localStorage.win0 < score){
+		localStorage.win0 = score;
+		localStorage.name0 = winplayer;
+	}
+	else if (localStorage.win1 < score){
+		localStorage.win1 = score;
+		ocalStorage.name1 = winplayer;
+	}
+}
+
+function displayLocalBoard(){ //Display the local scoreboard!
+$(".displayScoreBoard").css("visibility", "visible");
+if (localStorage.win0 > 1){
+	$('#scoreDisplay1').text("1: " + localStorage.name0 + " scored " + localStorage.win0 + " points!");
+}
+if (localStorage.win1 > 1){
+	$('#scoreDisplay1').text("2: " + localStorage.name1 + " scored " + localStorage.win1 + " points!");
+}
 }
 
 
@@ -239,6 +269,8 @@ for (var q = 0; q <= wordsLive.length; q++){ //Determines if the user has correc
 
 $(document).ready(function(){
 	$(".mainGame").css("visibility", "hidden"); //Hide the game page
+
+	$(".displayScoreBoard").css("visibility", "hidden");
 	var color = "unspecified"; //Used to store the users chosen color
 	
 

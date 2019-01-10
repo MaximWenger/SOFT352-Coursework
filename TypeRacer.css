@@ -6,6 +6,13 @@
   transform: translate(-50%,-50%);
  
 }
+
+.displayScoreBoard{
+	  position: absolute;
+  top: 50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+}
 .col-5{
 	background: red;
 	  top: 50%;

@@ -19,7 +19,7 @@ var players = {}; // To store all current users
 var games = {}; //To store all current games
 var timerMain; //Used as main timer for server
 var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut", "Lychee", "Mango", "Mulberry", "Olive", "Orange", "Lime", "Kiwi", "Juniper", "Pear", "Persimmon", "Physalis", "Pineapple", "Plum", "Strawberry", "Star fruit", "Redcurrant", "Quince" ];
-var wordTimer = 0;
+
 var gameLengthTimer = 30;
 
 wsServer.on("request", function(request) {
@@ -354,7 +354,7 @@ function findWinner(id){//Returns the winner (p1 or p2)
 }
 
 function incrementGTime(){ //Increment the game timer by 1 each Tick
-wordTimer++;
+
   for (var id in games) {
     games[id].gmeTime = games[id].gmeTime + 1;
    }
