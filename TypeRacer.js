@@ -4,6 +4,15 @@ var WebSocketClient = new WebSocket("ws://localhost:9000");
 var wordsLive = [];
 var wordsReserve = [];
 var gameStart = false;
+var opponentName;
+var opponentScore;
+var userName;
+var score;
+	var p1Name;
+	var p2Name;
+	var p1Score = 0;
+	var p2Score = 0;
+
 
 WebSocketClient.onopen = function(event){ //When connection is on, do this
 	WebSocketClient.send("Hello world from the client");
@@ -24,6 +33,12 @@ if (msg == "start"){
 	if (wordsLive.length <= 11){
 	wordsLive[wordsLive.length] = message.data;//Only keep 12 words ready at any time
 	}
+//	else if (msg == "draw"){
+//		console.log("DRRRRRAAAAAAWWWWWWWWWWWWWWW");
+//	}
+//	else if (msg == "win"){
+//		console.log("wIIIIIIIIIIIIIIIIIIIIIIIIIINNNNNNNNNNN");
+//	}
 	else {
 		wordsReserve[wordsReserve.length] = message.data;//Used to store all other words
 	}
@@ -65,11 +80,75 @@ function identifyMsg(message){//Used to identify the type of message sent from s
 	if (fullMsg.includes("start")){//Used to identfy if the message is a new game
 		return "start";
 	}
+	else if (fullMsg.includes("Draw")){ //Used to identify if the game is over and drawn
+	populateLocalScore();
+		return "draw";
+	}
+	else if (fullMsg.includes("Win")){ //Used to identify if the game is over and won
+	populateLocalScore(fullMsg);
+		return "win";
+	}
+	else if (fullMsg.includes("~P")){
+		updateScores(fullMsg);
+	}
 	else {
 		//words[words.length] = fullMsg; 
 		return "play";
 	}
 }
+
+function updateScores(message){ //Gets values of player usernames and player scores
+	var fullMsg = message;
+	if (fullMsg.includes("~P1N")){//Player 1 name
+	 p1Name = getScoreValues(message);
+	 console.log(p1Name + "P1 NAME");
+	}
+	else if (fullMsg.includes("~P1S")){ //Player 1 score
+		p1Score = getScoreValues(message);
+		 console.log(p1Score + "P1 SCORE");
+	}
+	else if (fullMsg.includes("~P2N")){ //Player 2 name
+		p2Name = getScoreValues(message);
+		 console.log(p2Name + "P2 NAME");
+	}
+	else if (fullMsg.includes("~P2S")){
+		p2Score = getScoreValues(message); //Player 2 score
+		console.log(p2Score + "P2 SCORE");
+	}
+	
+	updateFrontScores();
+
+}
+
+function updateFrontScores(){//Updates scores on front page
+	if (userName == p1Name){//Find who this player is (p1 or p2?)
+		$("#userInfo").text("Your Score:" + p1Score);
+	$("#opponentInfo").text(p2Name + "'s Score:" + p2Score);
+	} else if (userName == p2Name){
+		$("#userInfo").text("Your Score:" + p2Score);
+		$("#opponentInfo").text(p1Name + "'s Score:" + p1Score);
+	}
+}
+
+function getScoreValues(message){//Returns the score or userName for the current players
+var fullMsg = message;
+var scoreValue;
+scoreValue = fullMsg.slice(4);
+return scoreValue;
+}
+
+function populateLocalScore(message){
+//Compare all scores, Order them and display them.
+
+
+if (localStorage.win1 == null){ //If no score is kept, populate with default values
+localStorage.win = [0,0,0,0,0,0,0,0,0,0]; //Used to keep the score of winners
+localStorage.name = [0,0,0,0,0,0,0,0,0,0]; //User to keep the name of winners
+}
+
+	
+}
+
 
 function updateConnStatus(){ //Updates server status to green
 	$(".serverStatusBx").css("background-color", "#008000");
@@ -186,7 +265,7 @@ color = chosenColor("dotGreen");
 
 $("#userStartBtn").click(function(){
 	//sendServer("testing testing, 1,2,3");
-	var userName = $('#userName').val();
+	 userName = $('#userName').val();
 
 	WebSocketClient.send(color + "~" + userName);
 });

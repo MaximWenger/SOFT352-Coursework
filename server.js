@@ -61,7 +61,7 @@ wsServer.on("request", function(request) {
 			}
 			else if (id == games[p].p2.Id){ // use the connection ID to find the player within a game
 				console.log("YUPP");
-				getScore(request);
+				//getScore(request);
 				games[p].p2Score = getScore(request);  //update the player score
 			}
 					
@@ -251,8 +251,34 @@ for (var p in games){
 		sendStart();
 	} else {
 	sendWord(); //Send a new word to each user
+	sendGScoreName(p);
 	}
 }
+}
+
+function sendGScoreName(id){ //Keeps the clients uptodate with game scores
+	var p1Name = games[id].p1.name;
+	var p2Name = games[id].p2.name;
+	
+	var p1Scre = games[id].p1Score;
+	var p2Scre = games[id].p2Score;
+	
+	var p1ID = games[id].p1.Id;
+	var p2ID = games[id].p2.Id;
+	
+	//var message = "score" + "P1.N" + p1Name + "P1.N" + p1Scre + "P2.N" + p2Name + "P2.N" + p2Scre;
+	
+		connections[p1ID].sendUTF("~P1N" + p1Name);//Sends the word to player 1
+		connections[p1ID].sendUTF("~P1S" + p1Scre);//Sends the word to player 1
+		connections[p1ID].sendUTF("~P2N" + p2Name);//Sends the word to player 1
+		connections[p1ID].sendUTF("~P2S" + p2Scre);//Sends the word to player 1
+		
+		connections[p2ID].sendUTF("~P1N" + p1Name);//Sends the word to player 1
+		connections[p2ID].sendUTF("~P1S" + p1Scre);//Sends the word to player 1
+		connections[p2ID].sendUTF("~P2N" + p2Name);//Sends the word to player 1
+		connections[p2ID].sendUTF("~P2S" + p2Scre);//Sends the word to player 1
+
+		//Send one message for each thing
 }
 
 
@@ -277,7 +303,7 @@ function updatePlayerGState(id){//Changes player "playing" state to "N" since th
 	games[id].p2.playing = "N";
 }
 
-function sendScoreWinner(winner, id){//Sends the winning score the players.
+function sendScoreWinner(winner, id){//Sends the winning score the players at the end of each game
 	var p1ID = games[id].p1.Id;
 	var p2ID = games[id].p2.Id;
 	
