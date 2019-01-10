@@ -262,12 +262,19 @@ function checkGTime(){ //Check time, end game if time >= 60 seconds
 		winner = findWinner(id);
 		console.log(winner);
 		sendScoreWinner(winner, id);
-		stopTicker();
+		//updatePlayerGState(id);
+		removeGame(id);
+		//stopTicker();
 		//END GAME
 		//Send message to client to end the game
 		//Display the scoreboard
 	}
    }
+}
+
+function updatePlayerGState(id){//Changes player "playing" state to "N" since the game is finished
+	games[id].p1.playing = "N";
+	games[id].p2.playing = "N";
 }
 
 function sendScoreWinner(winner, id){//Sends the winning score the players.
@@ -295,8 +302,12 @@ function sendScoreWinner(winner, id){//Sends the winning score the players.
 	}
 }
 
-function removeGame(id){ //Deletes the game
+function removeGame(id){ //Deletes the game after it's completed
+	console.log(Object.keys(games).length + " = Amount of games before");
+console.log("REMOVING GAME");
 	delete games[id];
+	console.log("GAME REMOVED");
+	console.log(Object.keys(games).length + " = Amount of games after");
 }
 
 function findWinner(id){//Returns the winner (p1 or p2)
