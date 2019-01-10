@@ -8,10 +8,10 @@ var opponentName;
 var opponentScore;
 var userName;
 var score;
-	var p1Name;
-	var p2Name;
-	var p1Score = 0;
-	var p2Score = 0;
+var p1Name;
+var p2Name;
+var p1Score = 0;
+var p2Score = 0;
 
 
 WebSocketClient.onopen = function(event){ //When connection is on, do this
@@ -24,10 +24,8 @@ WebSocketClient.onmessage = function(message){ //When get a message, do this
     console.log("Received: " + message.data);
 var msg = identifyMsg(message);
 if (msg == "start"){
-	//Remove everything and be ready to recieve and display words!
 	gameStart = true;
 	changeGameModePlay();
-	
 } else if (msg == "play"){//Store the words within an array
 	if (wordsLive.length <= 11){
 	wordsLive[wordsLive.length] = message.data;//Only keep 12 words ready at any time
@@ -36,35 +34,11 @@ if (msg == "start"){
 		wordsReserve[wordsReserve.length] = message.data;//Used to store all other words
 	}
 	populateWords();
-	//NOW move these words onto any of the grids
-	//Display the words within the grids 
-//Have the letters change, depending on what is being typed
-//The word will automatically be entered, no pressing enter
-//The timer will appear in the top left, along with the enemy, and each score (Score 1pt per letter of a correct word)
 }
 }
 
 WebSocketClient.onerror = function (event){
 	console.log("Error connecting to server =" + event);
-	
-}
-
-function changeGameModePlay(){ //Change the visibility to remove front page and display game page.
-	$(".mainStart").css("visibility", "hidden"); //Once the game starts, remove the original webpage
-	$(".mainGame").css("visibility", "visible");//Show the game page
-	$("#userGameTxt").select(); //Autoselect the textbox so the user can begin typing
-}
-
-function populateWords(){//Populates the words for the user to type
-
-if (wordsLive.length < 12 && wordsReserve.length > 1){
-	wordsLive[wordsLive.length] = wordsReserve[0];
-	wordsReserve.splice(1, 1);//Removes the word from wordsReserve
-}
-	
-	for (var i = 0; i <= 12 && i < wordsLive.length; i++){ //Populate the display grid with given words from the server
-		$("#grid" + (i + 1)).text(wordsLive[i]);
-	}
 }
 
 function identifyMsg(message){//Used to identify the type of message sent from server
@@ -90,6 +64,28 @@ function identifyMsg(message){//Used to identify the type of message sent from s
 	}
 }
 
+function updateConnStatus(){ //Updates server status to green
+	$(".serverStatusBx").css("background-color", "#008000");
+	$('#serverStatusTxt').text('Online');
+}
+
+function changeGameModePlay(){ //Change the visibility to remove front page and display game page.
+	$(".mainStart").css("visibility", "hidden"); //Once the game starts, remove the original webpage
+	$(".mainGame").css("visibility", "visible");//Show the game page
+	$("#userGameTxt").select(); //Autoselect the textbox so the user can begin typing
+}
+
+function populateWords(){//Populates the words for the user to type
+if (wordsLive.length < 12 && wordsReserve.length > 1){
+	wordsLive[wordsLive.length] = wordsReserve[0];
+	wordsReserve.splice(1, 1);//Removes the word from wordsReserve
+}
+	for (var i = 0; i <= 12 && i < wordsLive.length; i++){ //Populate the display grid with given words from the server
+		$("#grid" + (i + 1)).text(wordsLive[i]);
+	}
+}
+
+
 function updateScores(message){ //Gets values of player usernames and player scores
 	var fullMsg = message;
 	if (fullMsg.includes("~P1N")){//Player 1 name
@@ -108,9 +104,7 @@ function updateScores(message){ //Gets values of player usernames and player sco
 		p2Score = getScoreValues(message); //Player 2 score
 		console.log(p2Score + "P2 SCORE");
 	}
-	
 	updateFrontScores();
-
 }
 
 function updateFrontScores(){//Updates scores on front page
@@ -130,31 +124,26 @@ scoreValue = fullMsg.slice(4);
 return scoreValue;
 }
 
-function populateLocalScore(message){
-//Compare all scores, Order them and display them.
-
-
+function populateLocalScore(message){ //populate the scoreboard with local scores
 if (localStorage.win1 == null){ //If no score is kept, populate with default values
 localStorage.win0 = 0; //Used to keep the score of winners
 localStorage.win1 = 0;
 
 localStorage.name0 = ""; //User to keep the name of winners
 localStorage.name1 = "";
-
 }
- //Bubble sort to organise both (depending on number array)
  var winScore;
  var winPlayer;
  var position;
- if (p1Score > p2Score){
-	 winScore = p1Score;
-	 winPlayer = p1Name;
-position = sortLeaderBoard(winScore, winPlayer);
- } else if (p2Score > p1Score){
-	 winScore = p2Score;
-	 winPlayer = p2Name;
-position =  sortLeaderBoard(winScore, winPlayer);
- }
+ if (p1Score > p2Score){ //Used to determine if the new score is higher the scores already stored locally!
+	winScore = p1Score;
+	winPlayer = p1Name;
+	position = sortLeaderBoard(winScore, winPlayer);
+	} else if (p2Score > p1Score){
+		winScore = p2Score;
+		winPlayer = p2Name;
+		position =  sortLeaderBoard(winScore, winPlayer);
+	}
 	displayLocalBoard();
 }
 
@@ -180,10 +169,7 @@ if (localStorage.win1 > 1){
 }
 
 
-function updateConnStatus(){ //Updates server status to green
-	$(".serverStatusBx").css("background-color", "#008000");
-	$('#serverStatusTxt').text('Online');
-}
+
 function chosenColor(Color){ //Turns all other colors opaque (Keeping chosen color full) Returns chosen color
 	var colors = ["dotPink", "dotOrange", "dotBlue", "dotGreen"];
 	var color = Color;
@@ -198,13 +184,12 @@ function chosenColor(Color){ //Turns all other colors opaque (Keeping chosen col
 	return color;
 }
 
-function sendServer(message){
+function sendServer(message){//Sends a message to the server
 	WebSocketClient.send(message);
 }
 
 function removeLiveWord(number){//Removes the live word after user has typed it correctly
 	wordsLive.splice(number, 1);//Removes the word from wordsReserve
-	
 }
 
 function clearUserInput(){//Clears the user input, to allow them to continue typing
@@ -213,11 +198,10 @@ function clearUserInput(){//Clears the user input, to allow them to continue typ
 
 function tryMatch(user, wordStore){//used to compare the user imput to stored words
 	if (user == wordStore){
-		return true;
-		//It matches! Try another one
+		return true; //The word does match
 		}
 		else {
-			return false;
+			return false;//The word does not match
 		}
 }
 
@@ -271,43 +255,38 @@ $(document).ready(function(){
 	$(".mainGame").css("visibility", "hidden"); //Hide the game page
 
 	$(".displayScoreBoard").css("visibility", "hidden");
+	
 	var color = "unspecified"; //Used to store the users chosen color
 	
 
 $(".dotPink").click(function () {
 console.log("Chosen dotPink");
 color = chosenColor("dotPink");//Used to update the users chosen color
-
 });
+
 $(".dotOrange").click(function () {
 console.log("Chosen dotOrange");
 color = chosenColor("dotOrange");
-
 });
+
 $(".dotBlue").click(function () {
 console.log("Chosen dotBlue");
 color = chosenColor("dotBlue");
-
 });
+
 $(".dotGreen").click(function () {
 console.log("Chosen dotGreen");
 color = chosenColor("dotGreen");
-
 });
 
 $("#userStartBtn").click(function(){
-	//sendServer("testing testing, 1,2,3");
 	 userName = $('#userName').val();
-
 	WebSocketClient.send(color + "~" + userName);
 });
 
-$("body").keypress(function(evt){//
+$("body").keypress(function(evt){
 testUserText();//Used to find out if the users Text matches with any of the given words
-
 });
-
-
 });
 
 
