@@ -124,6 +124,7 @@ var lengthMatch = 0;
 var word;
 var complete = false;  //Used to ensure only one word is removed if dupes within the array
 if (gameStart == true){//the game has started
+while (complete == false){
 for (var q = 0; q <= wordsLive.length; q++){ //Determines if the user has correctly typed the whole word displayed on the screen
 	word = wordsLive[q]
 	for (var i = 0; i <= userValue.length; i++){//For the entire length of the user value

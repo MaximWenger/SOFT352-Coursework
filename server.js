@@ -20,6 +20,7 @@ var games = {}; //To store all current games
 var timerMain; //Used as main timer for server
 var gameWords = ["Apple", "Apricot", "Avacado", "Banana", "Bilberry", "Blackcurrant", "BlueBerry", "Boysenberry", "Currant", "Coconut", "Lychee", "Mango", "Mulberry", "Olive", "Orange", "Lime", "Kiwi", "Juniper", "Pear", "Persimmon", "Physalis", "Pineapple", "Plum", "Strawberry", "Star fruit", "Redcurrant", "Quince" ];
 var wordTimer = 0;
+var gameLengthTimer = 30;
 
 wsServer.on("request", function(request) {
   var connection = request.accept(null, request.origin);
@@ -54,26 +55,22 @@ wsServer.on("request", function(request) {
 			
 			for (var p in games){
 				//console.log(games[p].p1.Id);//Player id
-			if (id == games[p].p1.Id){
+			if (id == games[p].p1.Id){ // use the connection ID to find the player within a game
 				console.log("YUPPPP");
-				games[p].p1Score = getScore(request);
+				games[p].p1Score = getScore(request); //update the player score
 			}
-			else if (id == games[p].p2.Id){
+			else if (id == games[p].p2.Id){ // use the connection ID to find the player within a game
 				console.log("YUPP");
 				getScore(request);
-				games[p].p2Score = getScore(request);
+				games[p].p2Score = getScore(request);  //update the player score
 			}
 					
 					//connections[id].sendUTF("AHHHHHHHHHHHHH");				
 					//connections[games[p].p2.Id].sendUTF("AGGGGGGGGGGGGG"); THESE BOTH GO TO THE SAME ID
 					//console.log(id) + "Just ID";
 					//console.log(games[p].p2.Id + "BIG LONG ONE");
-
-					
-			console.log(games[p].p1Score + "P1 score");
-			console.log(games[p].p2Score + "P2 score");
 			
-			stopTicker();
+		
 			}
 		}
 		
@@ -261,12 +258,62 @@ for (var p in games){
 
 function checkGTime(){ //Check time, end game if time >= 60 seconds
 	  for (var id in games) {
-    if (games[id].gmeTime >= 60){
+    if (games[id].gmeTime >= gameLengthTimer){
+		winner = findWinner(id);
+		console.log(winner);
+		sendScoreWinner(winner, id);
+		stopTicker();
 		//END GAME
 		//Send message to client to end the game
 		//Display the scoreboard
 	}
    }
+}
+
+function sendScoreWinner(winner, id){//Sends the winning score the players.
+	var p1ID = games[id].p1.Id;
+	var p2ID = games[id].p2.Id;
+	
+	var p1Sc = games[id].p1Score;
+	var p2Sc = games[id].p2Score;
+	
+	var message;
+	if (winner == "draw"){
+		message = "Draw." + p1Sc ;
+		connections[p1ID].sendUTF(message);//Sends the word to player 1
+		connections[p2ID].sendUTF(message);//Sends the word to player 1
+		
+	} else if (winner == "p1Score"){
+		message = "Player1Win." + p1Sc + "Player2Loose." + p2Sc;
+		connections[p1ID].sendUTF(message);//Sends the word to player 1
+		connections[p2ID].sendUTF(message);//Sends the word to player 2
+	} else if (winner == "p2Score"){
+		
+		message = "Player2Win." + p2Sc + "Player1Loose." + p1Sc;
+		connections[p1ID].sendUTF(message);//Sends the word to player 1
+		connections[p2ID].sendUTF(message);//Sends the word to player 1
+	}
+}
+
+function removeGame(id){ //Deletes the game
+	delete games[id];
+}
+
+function findWinner(id){//Returns the winner (p1 or p2)
+	var player1 = 0;
+	var player2 = 0;
+	player1 = games[id].p1Score;
+	player2 = games[id].p2Score;
+	
+	if (player1 > player2){
+		return "p1Score";
+	}
+	else if (player2 > player1){
+		return "p2Score";
+	}
+	else {
+		return "draw";
+	}
 }
 
 function incrementGTime(){ //Increment the game timer by 1 each Tick
